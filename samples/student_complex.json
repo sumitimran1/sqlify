@@ -1,0 +1,48 @@
+{
+  "student": {
+    "number": 101,
+    "name": "Ayse Yilmaz",
+    "active": true,
+    "address": {
+      "city": "Kocaeli",
+      "district": "Izmit",
+      "neighborhood": "Yahya Kaptan"
+    },
+    "courses": [
+      {
+        "code": "CSE202",
+        "name": "Data Structures",
+        "grades": [
+          {
+            "type": "midterm",
+            "score": 82
+          },
+          {
+            "type": "final",
+            "score": 91
+          }
+        ]
+      },
+      {
+        "code": "CSE204",
+        "name": "Database Systems",
+        "grades": [
+          {
+            "type": "project",
+            "score": 95
+          }
+        ]
+      }
+    ],
+    "phones": [
+      {
+        "type": "mobile",
+        "number": "555-0101"
+      },
+      {
+        "type": "home",
+        "number": "262-0000"
+      }
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "string": "TEXT",
+  "int": "INTEGER",
+  "float": "REAL",
+  "bool": "INTEGER",
+  "null": "TEXT",
+  "object": "TEXT",
+  "array": "TEXT"
+}

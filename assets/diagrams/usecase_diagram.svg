@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="360" viewBox="0 0 700 360">
+  <style> .actor{font-family:Arial;font-size:13px;fill:#0b1220} .oval{fill:#fff;stroke:#065f46;stroke-width:1.6} .text{font-family:Arial;font-size:13px;fill:#0b1220}</style>
+
+  <!-- Actor -->
+  <text x="60" y="60" class="actor">Kullanıcı</text>
+  <circle cx="60" cy="80" r="18" stroke="#0b1220" fill="none"/>
+
+  <!-- Use cases (ovals) -->
+  <ellipse cx="300" cy="80" rx="120" ry="28" class="oval"/>
+  <text x="300" y="85" text-anchor="middle" class="text">JSON yükle</text>
+
+  <ellipse cx="300" cy="140" rx="130" ry="28" class="oval"/>
+  <text x="300" y="145" text-anchor="middle" class="text">Dönüşüm başlat</text>
+
+  <ellipse cx="300" cy="200" rx="140" ry="28" class="oval"/>
+  <text x="300" y="205" text-anchor="middle" class="text">Önizleme görüntüle</text>
+
+  <ellipse cx="300" cy="260" rx="110" ry="28" class="oval"/>
+  <text x="300" y="265" text-anchor="middle" class="text">SQL indir</text>
+
+  <!-- Lines from actor to use cases -->
+  <line x1="78" y1="80" x2="180" y2="80" stroke="#0b1220"/>
+  <line x1="78" y1="80" x2="180" y2="140" stroke="#0b1220"/>
+  <line x1="78" y1="80" x2="180" y2="200" stroke="#0b1220"/>
+  <line x1="78" y1="80" x2="180" y2="260" stroke="#0b1220"/>
+</svg>

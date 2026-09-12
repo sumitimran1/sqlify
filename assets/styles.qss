@@ -1,0 +1,304 @@
+QWidget {
+	color: #eaf6ff;
+	font-family: Segoe UI, Inter, Roboto, Arial, sans-serif;
+	font-size: 10pt;
+	background: transparent;
+}
+
+#appRoot {
+	background: transparent;
+}
+
+#topStatusBar,
+#navRow,
+#mainPanel,
+#heroCard,
+#enginePanel,
+#logPanel,
+#toolbarPanel,
+#codePanel,
+#sidePanel,
+#dangerCard,
+#glassCard {
+	background: rgba(12, 18, 36, 0.72);
+	border: 1px solid rgba(123, 44, 255, 0.16);
+	border-radius: 22px;
+}
+
+#topStatusBar {
+	background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 rgba(5, 10, 25, 0.78), stop:1 rgba(8, 14, 32, 0.55));
+	border-radius: 18px;
+	border: 1px solid rgba(123, 44, 255, 0.10);
+	padding: 0px;
+}
+
+#navRow {
+	background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 rgba(6, 10, 25, 0.62), stop:1 rgba(10, 15, 34, 0.50));
+	border-radius: 18px;
+	border: 1px solid rgba(77, 239, 255, 0.08);
+}
+
+#mainPanel {
+	background: rgba(7, 10, 22, 0.42);
+	border: 1px solid rgba(77, 239, 255, 0.05);
+	border-radius: 24px;
+}
+
+#heroCard {
+	background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 rgba(12, 18, 36, 0.78), stop:1 rgba(6, 10, 22, 0.68));
+	border: 1px solid rgba(123, 44, 255, 0.18);
+	border-radius: 28px;
+}
+
+#heroTitle {
+	font-size: 34pt;
+	font-weight: 900;
+	color: #f5fbff;
+	letter-spacing: 0.4px;
+}
+
+#heroDesc {
+	color: #9fb0d9;
+	font-size: 13pt;
+	line-height: 1.45;
+}
+
+#headerTitle {
+	font-size: 13pt;
+	font-weight: 800;
+	color: #f5fbff;
+}
+
+#headerSubtitle,
+#headerCenterTitle {
+	color: #9fb0d9;
+	font-size: 9.5pt;
+}
+
+#headerCenterTitle {
+	font-size: 11pt;
+	font-weight: 700;
+	color: #eaf6ff;
+}
+
+#panelTitle {
+	font-size: 12pt;
+	font-weight: 800;
+	color: #eaf6ff;
+}
+
+#cardTitle,
+#featureTitle {
+	color: #bcd3ff;
+	font-weight: 700;
+	font-size: 10pt;
+}
+
+#cardValue {
+	color: #ffffff;
+	font-weight: 900;
+	font-size: 18pt;
+}
+
+#cardSubtitle,
+#featureDescription {
+	color: #9fb0d9;
+	font-size: 9pt;
+}
+
+#featureBadge {
+	background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 rgba(123,44,255,0.95), stop:1 rgba(0,170,255,0.95));
+	color: white;
+	border-radius: 20px;
+	font-weight: 800;
+}
+
+QPushButton {
+	border: none;
+	border-radius: 18px;
+	padding: 10px 16px;
+	color: #eaf6ff;
+}
+
+QPushButton#navButton {
+	background: rgba(255,255,255,0.02);
+	border: 1px solid rgba(255,255,255,0.03);
+	padding: 12px 16px;
+	min-width: 132px;
+	font-weight: 700;
+}
+
+QPushButton#navButton:hover {
+	background: rgba(77, 239, 255, 0.08);
+	border: 1px solid rgba(77, 239, 255, 0.16);
+}
+
+QPushButton#navButton[active="true"] {
+	background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 rgba(123,44,255,0.98), stop:1 rgba(0,170,255,0.98));
+	border: 1px solid rgba(255,255,255,0.16);
+	color: #ffffff;
+}
+
+QPushButton#schemaStatusButton {
+	background: rgba(255,255,255,0.03);
+	border: 1px solid rgba(123,44,255,0.24);
+	border-radius: 18px;
+	padding: 10px 16px;
+	font-weight: 800;
+	color: #eaf6ff;
+	text-align: left;
+}
+
+QPushButton#schemaStatusButton:hover {
+	background: rgba(77,239,255,0.08);
+	border: 1px solid rgba(77,239,255,0.26);
+}
+
+QPushButton#schemaStatusButton:pressed {
+	background: rgba(123,44,255,0.18);
+	border: 1px solid rgba(255,255,255,0.18);
+}
+
+QPushButton#primaryButton {
+	background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #7b2cff, stop:1 #00aaff);
+	color: white;
+	font-weight: 800;
+	padding: 14px 22px;
+	border-radius: 20px;
+}
+
+QPushButton#primaryButton:hover {
+	background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #8e4bff, stop:1 #2fc5ff);
+}
+
+QPushButton#secondaryButton,
+QPushButton#windowControl {
+	background: rgba(255,255,255,0.04);
+	border: 1px solid rgba(255,255,255,0.06);
+	color: #eaf6ff;
+	font-weight: 700;
+}
+
+QPushButton#secondaryButton:hover,
+QPushButton#windowControl:hover {
+	background: rgba(77, 239, 255, 0.08);
+	border: 1px solid rgba(77, 239, 255, 0.18);
+}
+
+QPushButton#dangerButton {
+	background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255,77,109,0.92), stop:1 rgba(215,0,50,0.96));
+	color: white;
+	font-weight: 800;
+	padding: 14px 22px;
+}
+
+QPushButton#dangerButton:hover {
+	background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255,77,109,1), stop:1 rgba(255,35,80,1));
+}
+
+QLineEdit#searchBox {
+	background: rgba(7, 12, 24, 0.82);
+	border: 1px solid rgba(123,44,255,0.14);
+	border-radius: 16px;
+	padding: 12px 14px;
+	color: #eaf6ff;
+}
+
+QLineEdit#searchBox:focus {
+	border: 1px solid rgba(77,239,255,0.36);
+}
+
+QPlainTextEdit#codeViewer,
+QTextEdit,
+QPlainTextEdit,
+QTreeWidget,
+QTableWidget,
+QListWidget {
+	background: rgba(6, 10, 20, 0.86);
+	border: 1px solid rgba(255,255,255,0.05);
+	border-radius: 16px;
+	color: #eaf6ff;
+}
+
+QPlainTextEdit#codeViewer,
+QTextEdit,
+QPlainTextEdit {
+	selection-background-color: rgba(123,44,255,0.32);
+	selection-color: #ffffff;
+}
+
+QTreeWidget::item,
+QTableWidget::item,
+QListWidget::item {
+	padding: 8px 10px;
+}
+
+QTreeWidget::item:selected,
+QTableWidget::item:selected,
+QListWidget::item:selected {
+	background: rgba(123,44,255,0.22);
+	color: #ffffff;
+}
+
+QHeaderView::section {
+	background: rgba(255,255,255,0.04);
+	color: #bcd3ff;
+	border: none;
+	padding: 8px 12px;
+	font-weight: 700;
+}
+
+QTableWidget::item:hover,
+QTreeWidget::item:hover,
+QListWidget::item:hover {
+	background: rgba(77,239,255,0.06);
+}
+
+QTabWidget::pane {
+	border: 1px solid rgba(255,255,255,0.05);
+	border-radius: 16px;
+	background: rgba(6, 10, 20, 0.72);
+}
+
+QTabBar::tab {
+	background: rgba(255,255,255,0.03);
+	color: #bcd3ff;
+	padding: 10px 16px;
+	margin-right: 6px;
+	border-top-left-radius: 14px;
+	border-top-right-radius: 14px;
+}
+
+QTabBar::tab:selected {
+	background: rgba(123,44,255,0.20);
+	color: #ffffff;
+}
+
+QProgressBar {
+	background: rgba(255,255,255,0.05);
+	border: none;
+	border-radius: 6px;
+	text-align: center;
+	color: #eaf6ff;
+	height: 14px;
+}
+
+QProgressBar::chunk {
+	border-radius: 6px;
+	background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #7b2cff, stop:1 #4defff);
+}
+
+#toast {
+	background: rgba(10, 16, 30, 0.92);
+	border: 1px solid rgba(77, 239, 255, 0.18);
+	border-radius: 16px;
+	padding: 12px 16px;
+	color: #ffffff;
+	font-weight: 700;
+}
+
+#dangerCard {
+	background: rgba(30, 8, 16, 0.76);
+	border: 1px solid rgba(255,77,109,0.22);
+}
+

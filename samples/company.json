@@ -1,0 +1,43 @@
+[
+  {
+    "company": "KOU Tech",
+    "founded": 2005,
+    "location": {
+      "city": "Kocaeli",
+      "country": "Turkey"
+    },
+    "departments": [
+      {
+        "name": "Engineering",
+        "employees": [
+          {
+            "name": "Can",
+            "role": "Developer"
+          },
+          {
+            "name": "Elif",
+            "role": "Tester"
+          }
+        ]
+      },
+      {
+        "name": "Research",
+        "employees": [
+          {
+            "name": "Mert",
+            "role": "Analyst"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "company": "DataLab",
+    "founded": 2012,
+    "location": {
+      "city": "Istanbul",
+      "country": "Turkey"
+    },
+    "departments": []
+  }
+]

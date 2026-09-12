@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="380" viewBox="0 0 800 380">
+  <style> .rect{fill:#ffffff;stroke:#0f172a;stroke-width:1.8} .title{font-family:Arial;font-weight:bold;font-size:14px;fill:#0f172a} .field{font-family:Arial;font-size:12px;fill:#0f172a}</style>
+
+  <!-- Table: JSONReader -->
+  <rect x="40" y="30" width="220" height="80" rx="4" class="rect"/>
+  <text x="150" y="52" text-anchor="middle" class="title">JSONReader</text>
+  <text x="60" y="74" class="field">+ load(path)</text>
+  <text x="60" y="94" class="field">+ parse()</text>
+
+  <!-- Table: SchemaAnalyzer -->
+  <rect x="300" y="30" width="260" height="100" rx="4" class="rect"/>
+  <text x="430" y="52" text-anchor="middle" class="title">SchemaAnalyzer</text>
+  <text x="320" y="74" class="field">+ analyze(data)</text>
+  <text x="320" y="94" class="field">- infer_type()</text>
+
+  <!-- Table: TableDefinition -->
+  <rect x="40" y="150" width="300" height="120" rx="4" class="rect"/>
+  <text x="190" y="172" text-anchor="middle" class="title">TableDefinition</text>
+  <text x="60" y="194" class="field">+ name</text>
+  <text x="60" y="214" class="field">+ columns</text>
+  <text x="60" y="234" class="field">+ primary_key</text>
+  <text x="60" y="254" class="field">+ foreign_keys</text>
+  <text x="60" y="274" class="field">+ to_sql()</text>
+
+  <!-- Table: SQLRenderer -->
+  <rect x="380" y="200" width="300" height="80" rx="4" class="rect"/>
+  <text x="530" y="222" text-anchor="middle" class="title">SQLRenderer</text>
+  <text x="400" y="244" class="field">+ render(tables)</text>
+
+  <!-- Relationships -->
+  <line x1="260" y1="80" x2="300" y2="80" stroke="#0f172a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="200" y1="150" x2="200" y2="150" stroke="#0f172a" stroke-width="1.5" />
+  <line x1="200" y1="150" x2="500" y2="200" stroke="#0f172a" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#0f172a"/>
+    </marker>
+  </defs>
+</svg>
