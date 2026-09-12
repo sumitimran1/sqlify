@@ -46,9 +46,14 @@ Featuring a dark glassmorphic UI built with **PySide6 (Qt6)**, SQLify provides r
 | :---: | :---: |
 | ![Home Dashboard](assets/screenshots/screenshot1.png) | ![JSON Inspector](assets/screenshots/screenshot2.png) |
 
-| Live Conversion & Normalization | Generated Tables & Analytics |
+| Live Conversion & Normalization | Generated Tables & Data Grid |
 | :---: | :---: |
 | ![Conversion Progress](assets/screenshots/screenshot3.png) | ![Tables Preview](assets/screenshots/screenshot4.png) |
+
+<p align="center">
+  <strong>Interactive Schema & Relational Structure Inspector</strong><br>
+  <img src="assets/screenshots/screenshot5.png" alt="Schema Visualizer" width="100%" />
+</p>
 
 ---
 

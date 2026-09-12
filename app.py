@@ -345,8 +345,8 @@ class EngineViz(QWidget):
 		self.phase = 0.0
 		self.progress = 0.0
 		self.setMinimumHeight(220)
-		self.setMaximumWidth(430)
-		self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+		self.setMinimumWidth(340)
+		self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 		self.timer = QTimer(self)
 		self.timer.timeout.connect(self._tick)
 		self.timer.start(35)
@@ -362,64 +362,94 @@ class EngineViz(QWidget):
 	def paintEvent(self, event):
 		p = QPainter(self)
 		p.setRenderHint(QPainter.Antialiasing)
+		p.setRenderHint(QPainter.TextAntialiasing)
 		w = self.width()
 		h = self.height()
 		p.fillRect(self.rect(), QColor(0, 0, 0, 0))
 
-		center = QPointF(w * 0.42, h * 0.48)
+		center = QPointF(w * 0.5, h * 0.45)
+		# Background orbital rings
 		for i in range(3):
-			r = 88 + i * 24
-			pen = QPen(QColor(123, 44, 255, 110 - i * 20))
+			r = 85 + i * 32
+			alpha = int(45 + 20 * math.sin(self.phase * 1.5 + i))
+			pen = QPen(QColor(123, 44, 255, alpha))
 			pen.setWidth(2)
 			p.setPen(pen)
-			p.drawEllipse(center, r, r)
+			p.drawEllipse(center, r, r * 0.65)
 
-		for i, label in enumerate(("JSON", "FLATTEN", "SQL")):
-			x = int(w * (0.18 + i * 0.26))
-			y = int(h * 0.42)
-			rect = QRectF(x - 62, y - 32, 124, 64)
+		# Top wave particle line
+		p.setPen(Qt.NoPen)
+		p.setBrush(QColor(77, 239, 255, 140))
+		for x in range(10, w - 10, 16):
+			y = int(h * 0.16 + math.sin(self.phase * 2.5 + x * 0.04) * 6)
+			p.drawEllipse(QPointF(x, y), 2.0, 2.0)
+
+		# 3 Process Badges
+		steps = [
+			("JSON INPUT", QColor(0, 170, 255)),
+			("NORMALIZATION", QColor(123, 44, 255)),
+			("SQLITE TABLES", QColor(77, 239, 255)),
+		]
+		card_w = min(140, max(110, int(w * 0.22)))
+		card_h = 56
+		y = int(h * 0.45)
+
+		positions_x = [
+			int(w * 0.20),
+			int(w * 0.50),
+			int(w * 0.80),
+		]
+
+		# Connecting flow arrows
+		for i in range(2):
+			sx = positions_x[i] + card_w // 2 + 10
+			ex = positions_x[i + 1] - card_w // 2 - 10
+			if ex > sx:
+				arrow_pen = QPen(QColor(77, 239, 255, 200), 2.5)
+				p.setPen(arrow_pen)
+				p.drawLine(sx, y, ex, y)
+				# Arrow head
+				p.drawLine(ex, y, ex - 8, y - 6)
+				p.drawLine(ex, y, ex - 8, y + 6)
+
+		# Draw cards
+		for i, (label, accent_color) in enumerate(steps):
+			cx = positions_x[i]
+			rect = QRectF(cx - card_w / 2, y - card_h / 2, card_w, card_h)
+
+			# Card Background gradient
 			grad = QLinearGradient(rect.topLeft(), rect.bottomRight())
-			grad.setColorAt(0, QColor(12, 18, 36, 210))
-			grad.setColorAt(1, QColor(5, 8, 22, 230))
-			p.setPen(QPen(QColor(120, 160, 255, 70), 1))
+			grad.setColorAt(0, QColor(18, 26, 52, 235))
+			grad.setColorAt(1, QColor(9, 14, 30, 245))
+
+			# Glowing border
+			p.setPen(QPen(accent_color, 1.8))
 			p.setBrush(QBrush(grad))
-			p.drawRoundedRect(rect, 18, 18)
+			p.drawRoundedRect(rect, 14, 14)
+
+			# Text label
+			font = QFont("Segoe UI", 9, QFont.Bold)
+			p.setFont(font)
 			p.setPen(QColor(234, 246, 255))
 			p.drawText(rect, Qt.AlignCenter, label)
-			if i < 2:
-				arrow_y = y
-				start_x = x + 70
-				end_x = int(w * (0.18 + (i + 1) * 0.26)) - 70
-				pen = QPen(QColor(77, 239, 255, 180))
-				pen.setWidth(3)
-				p.setPen(pen)
-				p.drawLine(start_x, arrow_y, end_x, arrow_y)
-				p.drawLine(end_x - 10, arrow_y - 8, end_x, arrow_y)
-				p.drawLine(end_x - 10, arrow_y + 8, end_x, arrow_y)
 
-		for i in range(4):
-			r = 120 + i * 20
-			alpha = int(36 + 18 * math.sin(self.phase * 2 + i))
-			pen = QPen(QColor(0, 170, 255, alpha))
-			pen.setWidth(2)
-			p.setPen(pen)
-			p.drawEllipse(center, r, r * 0.58)
+		# Bottom Progress Bar
+		bar_w = int(w * 0.84)
+		bar_x = int((w - bar_w) / 2)
+		bar_y = int(h * 0.82)
+		bar = QRectF(bar_x, bar_y, bar_w, 8)
 
-		bar = QRectF(w * 0.12, h * 0.84, w * 0.76, 8)
 		p.setPen(Qt.NoPen)
-		p.setBrush(QColor(255, 255, 255, 18))
+		p.setBrush(QColor(255, 255, 255, 22))
 		p.drawRoundedRect(bar, 4, 4)
-		fill = QRectF(bar.x(), bar.y(), bar.width() * self.progress, bar.height())
-		fill_grad = QLinearGradient(fill.topLeft(), fill.topRight())
-		fill_grad.setColorAt(0, QColor(123, 44, 255))
-		fill_grad.setColorAt(1, QColor(77, 239, 255))
-		p.setBrush(QBrush(fill_grad))
-		p.drawRoundedRect(fill, 4, 4)
 
-		p.setBrush(QColor(123, 44, 255, 140))
-		for x in range(0, w, 18):
-			y = int(h * 0.18 + math.sin(self.phase * 3 + x * 0.05) * 4)
-			p.drawEllipse(QPointF(x, y), 1.5, 1.5)
+		if self.progress > 0:
+			fill = QRectF(bar.x(), bar.y(), bar.width() * self.progress, bar.height())
+			fill_grad = QLinearGradient(fill.topLeft(), fill.topRight())
+			fill_grad.setColorAt(0, QColor(123, 44, 255))
+			fill_grad.setColorAt(1, QColor(77, 239, 255))
+			p.setBrush(QBrush(fill_grad))
+			p.drawRoundedRect(fill, 4, 4)
 
 
 class RelationGraph(QWidget):
@@ -525,7 +555,8 @@ class HomePage(BasePage):
 		illustration = EngineViz()
 		illustration.setMinimumHeight(220)
 		illustration.setMaximumHeight(260)
-		top.addWidget(illustration, 0)
+		illustration.setMaximumWidth(460)
+		top.addWidget(illustration, 1)
 
 		copy = QVBoxLayout()
 		copy.setSpacing(12)
@@ -552,7 +583,7 @@ class HomePage(BasePage):
 		cta_row.addStretch(1)
 		copy.addLayout(cta_row)
 		copy.addStretch(1)
-		top.addLayout(copy, 2)
+		top.addLayout(copy, 1)
 		hero_layout.addLayout(top)
 
 		stats = QHBoxLayout()
