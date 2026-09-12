@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SQLify — Dynamic NoSQL JSON to Relational SQLite Converter & Visualizer</title>
+  <meta name="description" content="A modern desktop GUI and engine that dynamically parses nested NoSQL JSON structures, normalizes arrays into relational tables with foreign keys, and builds queryable SQLite databases on the fly." />
+  <meta name="author" content="Sumit Imran" />
+  <meta name="theme-color" content="#050816" />
+
+  <!-- Open Graph / Social Media Meta -->
+  <meta property="og:title" content="SQLify — Dynamic NoSQL JSON to Relational SQLite Converter" />
+  <meta property="og:description" content="Convert deeply nested NoSQL JSON into normalized SQL tables dynamically with a modern glassmorphic PySide6 desktop app." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/screenshots/screenshot1.png" />
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    :root {
+      --bg-dark: #050816;
+      --bg-card: rgba(12, 18, 36, 0.72);
+      --bg-card-hover: rgba(18, 26, 52, 0.85);
+      --border-glow: rgba(123, 44, 255, 0.22);
+      --border-cyan: rgba(77, 239, 255, 0.28);
+      --purple: #7b2cff;
+      --blue: #00aaff;
+      --cyan: #4defff;
+      --text: #eaf6ff;
+      --text-muted: #9fb0d9;
+      --danger: #ff4d6d;
+      --success: #10b981;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+      line-height: 1.6;
+      background-image:
+        radial-gradient(circle at 15% 15%, rgba(123, 44, 255, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 25%, rgba(0, 170, 255, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 50% 85%, rgba(77, 239, 255, 0.08) 0%, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Ambient background grid */
+    .bg-grid {
+      background-size: 40px 40px;
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    }
+
+    /* Glassmorphic Container */
+    .glass {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-glow);
+      border-radius: var(--radius);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .glass:hover {
+      border-color: var(--border-cyan);
+      box-shadow: 0 10px 30px -10px rgba(0, 170, 255, 0.2);
+    }
+
+    /* Gradient Text */
+    .gradient-text {
+      background: linear-gradient(135deg, #ffffff 0%, #4defff 50%, #7b2cff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .gradient-purple {
+      background: linear-gradient(135deg, #7b2cff 0%, #00aaff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Neon Buttons */
+    .btn-primary {
+      background: linear-gradient(135deg, #7b2cff 0%, #00aaff 100%);
+      color: #ffffff;
+      padding: 12px 28px;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 20px rgba(123, 44, 255, 0.4);
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 28px rgba(77, 239, 255, 0.5);
+      background: linear-gradient(135deg, #8c42ff 0%, #1ab5ff 100%);
+    }
+
+    .btn-secondary {
+      background: rgba(12, 18, 36, 0.7);
+      color: var(--text);
+      padding: 12px 26px;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(20, 30, 60, 0.85);
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(5, 8, 22, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(123, 44, 255, 0.15);
+      padding: 16px 0;
+      transition: all 0.3s ease;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--cyan);
+    }
+
+    /* Hero Section */
+    .hero-section {
+      padding-top: 140px;
+      padding-bottom: 80px;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(123, 44, 255, 0.15);
+      border: 1px solid rgba(123, 44, 255, 0.35);
+      padding: 6px 18px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--cyan);
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 5vw, 4.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      max-width: 960px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-desc {
+      font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+      color: var(--text-muted);
+      max-width: 760px;
+      margin: 0 auto 36px auto;
+      font-weight: 400;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 50px;
+    }
+
+    /* Floating Window Preview Mockup */
+    .preview-window {
+      position: relative;
+      border-radius: 20px;
+      padding: 10px;
+      background: linear-gradient(135deg, rgba(123, 44, 255, 0.3), rgba(77, 239, 255, 0.3));
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 40px rgba(123, 44, 255, 0.25);
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .window-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      background: #090e1f;
+      border-top-left-radius: 14px;
+      border-top-right-radius: 14px;
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+
+    .window-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      background: #090e1f;
+      padding: 6px 12px;
+    }
+
+    .window-tab {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid transparent;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .window-tab.active {
+      background: rgba(123, 44, 255, 0.25);
+      border-color: rgba(77, 239, 255, 0.4);
+      color: #fff;
+    }
+
+    .window-body {
+      background: #050816;
+      border-bottom-left-radius: 14px;
+      border-bottom-right-radius: 14px;
+      overflow: hidden;
+      aspect-ratio: 16 / 9.5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .window-body img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Feature Grid */
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .section-tag {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--cyan);
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto;
+      font-size: 1.05rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+    }
+
+    .feature-card {
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .feature-icon-wrapper {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(123, 44, 255, 0.2), rgba(77, 239, 255, 0.2));
+      border: 1px solid rgba(77, 239, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--cyan);
+      font-size: 1.4rem;
+      margin-bottom: 22px;
+    }
+
+    .feature-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #ffffff;
+    }
+
+    .feature-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* Live Interactive Demo Playground */
+    .playground-section {
+      padding: 90px 0;
+    }
+
+    .playground-card {
+      padding: 24px;
+      border-radius: 20px;
+    }
+
+    .editor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 860px) {
+      .editor-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .editor-box {
+      background: #070b18;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      height: 420px;
+    }
+
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .editor-header h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .editor-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .sample-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .sample-btn:hover {
+      background: rgba(123, 44, 255, 0.3);
+      color: #fff;
+    }
+
+    textarea.code-area, .output-area {
+      flex: 1;
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #eaf6ff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      resize: none;
+      outline: none;
+      overflow-y: auto;
+      white-space: pre;
+    }
+
+    .output-area {
+      color: #4defff;
+    }
+
+    /* Architecture Section */
+    .diagram-card {
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .diagram-card img {
+      max-width: 100%;
+      height: 240px;
+      object-fit: contain;
+      margin: 16px 0;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+      transition: transform 0.3s;
+    }
+
+    .diagram-card:hover img {
+      transform: scale(1.03);
+    }
+
+    /* Terminal / Code Box */
+    .terminal-box {
+      background: #080c1a;
+      border: 1px solid rgba(123, 44, 255, 0.3);
+      border-radius: 14px;
+      padding: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      position: relative;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: rgba(123, 44, 255, 0.4);
+      color: #fff;
+    }
+
+    /* Modal for Image Inspection */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 8, 22, 0.92);
+      backdrop-filter: blur(12px);
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 16px;
+      border: 1px solid var(--border-cyan);
+      box-shadow: 0 0 50px rgba(77, 239, 255, 0.3);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 24px;
+      right: 28px;
+      color: #fff;
+      font-size: 2rem;
+      cursor: pointer;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 50px 0 30px 0;
+      margin-top: 100px;
+      background: rgba(3, 5, 14, 0.85);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      .hero-section {
+        padding-top: 110px;
+      }
+    }
+  </style>
+</head>
+<body class="bg-grid">
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-inner">
+      <a href="#" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #fff;">
+        <img src="assets/logo.svg" alt="SQLify Logo" width="36" height="36" />
+        <span style="font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em;">SQLify<span style="color: var(--cyan);">.</span></span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#demo">Live Demo</a></li>
+        <li><a href="#screenshots">Screenshots</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#quickstart">Quick Start</a></li>
+      </ul>
+
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <a href="https://github.com/sumitimran1/sqlify" target="_blank" rel="noopener noreferrer" class="btn-secondary" style="padding: 8px 18px; font-size: 0.88rem;">
+          <i class="fa-brands fa-github"></i>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-badge">
+        <i class="fa-solid fa-bolt"></i>
+        <span>Dynamic NoSQL to Relational SQL Engine</span>
+      </div>
+
+      <h1 class="hero-title">
+        Convert Nested NoSQL JSON into <span class="gradient-text">Normalized SQL</span> Databases On The Fly
+      </h1>
+
+      <p class="hero-desc">
+        Say goodbye to manual schema crafting. SQLify dynamically inspects arbitrary JSON, flattens composite structures, normalizes 1:N arrays into relational child tables, and produces ready-to-query SQLite databases.
+      </p>
+
+      <div class="hero-cta">
+        <a href="#quickstart" class="btn-primary">
+          <i class="fa-solid fa-download"></i> Get Started Free
+        </a>
+        <a href="#demo" class="btn-secondary">
+          <i class="fa-solid fa-play"></i> Try Live Simulator
+        </a>
+        <a href="https://github.com/sumitimran1/sqlify" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+          <i class="fa-brands fa-github"></i> Star on GitHub
+        </a>
+      </div>
+
+      <!-- App Showcase Preview Window with Interactive Tabs -->
+      <div class="preview-window">
+        <div class="window-header">
+          <div class="window-dots">
+            <div class="dot dot-red"></div>
+            <div class="dot dot-yellow"></div>
+            <div class="dot dot-green"></div>
+          </div>
+          <div style="color: var(--text-muted); font-size: 0.82rem; font-family: 'JetBrains Mono', monospace;">
+            SQLify — Desktop Application (PySide6)
+          </div>
+          <div style="width: 40px;"></div>
+        </div>
+
+        <div class="window-tabs">
+          <button class="window-tab active" onclick="switchPreviewTab(0, 'assets/screenshots/screenshot1.png')"><i class="fa-solid fa-house"></i> Home Dashboard</button>
+          <button class="window-tab" onclick="switchPreviewTab(1, 'assets/screenshots/screenshot2.png')"><i class="fa-solid fa-code"></i> JSON Inspector</button>
+          <button class="window-tab" onclick="switchPreviewTab(2, 'assets/screenshots/screenshot3.png')"><i class="fa-solid fa-gears"></i> Conversion Engine</button>
+          <button class="window-tab" onclick="switchPreviewTab(3, 'assets/screenshots/screenshot4.png')"><i class="fa-solid fa-table"></i> SQL Tables Grid</button>
+          <button class="window-tab" onclick="switchPreviewTab(4, 'assets/screenshots/screenshot5.png')"><i class="fa-solid fa-diagram-project"></i> Schema Visualizer</button>
+        </div>
+
+        <div class="window-body">
+          <img id="previewImage" src="assets/screenshots/screenshot1.png" alt="SQLify Desktop GUI Preview" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" style="padding: 90px 0;">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Core Capabilities</span>
+        <h2 class="section-title">Engineered for Automated Data Engineering</h2>
+        <p class="section-desc">
+          Everything you need to transform semi-structured, nested payloads into high-integrity relational schemas with zero manual DDL writing.
+        </p>
+      </div>
+
+      <div class="grid-3">
+        <!-- Feature 1 -->
+        <div class="glass feature-card">
+          <div class="feature-icon-wrapper">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <h3 class="feature-title">Dynamic Schema Inference</h3>
+          <p class="feature-desc">
+            Automatically scans root keys, detects primitive types (`INTEGER`, `REAL`, `TEXT`), and generates optimal DDL `CREATE TABLE` queries with primary keys and constraints.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="glass feature-card">
+          <div class="feature-icon-wrapper">
+            <i class="fa-solid fa-sitemap"></i>
+          </div>
+          <h3 class="feature-title">1:N Array Normalization</h3>
+          <p class="feature-desc">
+            Embedded lists and array collections (e.g. `orders[]`, `phones[]`, `courses[]`) are decoupled into relational child tables linked back via foreign keys with `CASCADE DELETE`.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="glass feature-card">
+          <div class="feature-icon-wrapper">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+          <h3 class="feature-title">Smart Object Flattening</h3>
+          <p class="feature-desc">
+            Composite JSON objects are flattened hierarchically (`address.city` &rarr; `address_city`), ensuring 1NF compliance while retaining clear lineage and context.
+          </p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="glass feature-card">
+          <div class="feature-icon-wrapper">
+            <i class="fa-solid fa-palette"></i>
+          </div>
+          <h3 class="feature-title">Dark Glassmorphic GUI</h3>
+          <p class="feature-desc">
+            Crafted with PySide6 (Qt6), featuring custom QSS styling, animated telemetry gauges, searchable tree hierarchies, and drag-and-drop file ingestion.
+          </p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="glass feature-card">
+          <div class="feature-icon-wrapper">
+            <i class="fa-solid fa-sliders"></i>
+          </div>
+          <h3 class="feature-title">Configurable Type Rules</h3>
+          <p class="feature-desc">
+            Customize SQL datatype mappings easily via `config/type_mapping.json` to suit custom database dialect preferences or strict validation requirements.
+          </p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="glass feature-card">
+          <div class="feature-icon-wrapper">
+            <i class="fa-solid fa-database"></i>
+          </div>
+          <h3 class="feature-title">Native SQLite Integration</h3>
+          <p class="feature-desc">
+            Directly generates SQLite `.db` binary files, populates normalized rows in real-time, and provides interactive sorting, filtering, and schema exploration.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live In-Browser Demo / Playground Simulator -->
+  <section id="demo" class="playground-section">
+    <div class="container">
+      <div class="glass playground-card">
+        <div class="section-header" style="margin-bottom: 30px;">
+          <span class="section-tag">Interactive Simulation</span>
+          <h2 class="section-title">Test the Normalization Logic Live</h2>
+          <p class="section-desc">
+            Paste your own JSON or pick a sample dataset below, then click <strong>"Run SQLify Engine"</strong> to preview the normalized SQL schema and child tables.
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 15px;">
+          <button class="sample-btn" onclick="loadSample('student')"><i class="fa-solid fa-graduation-cap"></i> Student Complex Sample</button>
+          <button class="sample-btn" onclick="loadSample('company')"><i class="fa-solid fa-building"></i> Company & Employees Sample</button>
+          <button class="sample-btn" onclick="loadSample('ecommerce')"><i class="fa-solid fa-cart-shopping"></i> E-Commerce Order Sample</button>
+        </div>
+
+        <div class="editor-grid">
+          <!-- Input Editor -->
+          <div class="editor-box">
+            <div class="editor-header">
+              <h4><i class="fa-solid fa-code"></i> Input JSON</h4>
+              <button class="sample-btn" onclick="formatInputJson()"><i class="fa-solid fa-align-left"></i> Format</button>
+            </div>
+            <textarea id="jsonInput" class="code-area" spellcheck="false">{
+  "student": {
+    "number": 101,
+    "name": "Ayse Yilmaz",
+    "active": true,
+    "address": {
+      "city": "Kocaeli",
+      "district": "Izmit",
+      "neighborhood": "Yahya Kaptan"
+    },
+    "courses": [
+      { "code": "CS101", "name": "Algorithms", "grades": [90, 95] },
+      { "code": "CS102", "name": "Databases", "grades": [85, 88] }
+    ],
+    "phones": ["+90 555 123 4567", "+90 555 987 6543"]
+  }
+}</textarea>
+          </div>
+
+          <!-- Output SQL Schema -->
+          <div class="editor-box">
+            <div class="editor-header">
+              <h4><i class="fa-solid fa-database"></i> Generated Relational SQLite Schema</h4>
+              <button class="sample-btn" onclick="copyGeneratedSQL()"><i class="fa-solid fa-copy"></i> Copy SQL</button>
+            </div>
+            <pre id="sqlOutput" class="output-area"></pre>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 24px;">
+          <button class="btn-primary" onclick="runClientConverter()">
+            <i class="fa-solid fa-play"></i> Run SQLify Engine
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screenshots Gallery -->
+  <section id="screenshots" style="padding: 90px 0;">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Visual Showcase</span>
+        <h2 class="section-title">Application Screenshots</h2>
+        <p class="section-desc">
+          Explore the PySide6 desktop interface designed for maximum clarity, speed, and analytical insight.
+        </p>
+      </div>
+
+      <div class="grid-3" style="grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));">
+        <!-- Screenshot 1 -->
+        <div class="glass diagram-card" onclick="openModal('assets/screenshots/screenshot1.png')">
+          <h4 style="font-weight: 700; color: #fff;">01. Home & Dashboard</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Hero section with dynamic engine visualization</p>
+          <img src="assets/screenshots/screenshot1.png" alt="Home Dashboard" />
+          <span class="sample-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to Zoom</span>
+        </div>
+
+        <!-- Screenshot 2 -->
+        <div class="glass diagram-card" onclick="openModal('assets/screenshots/screenshot2.png')">
+          <h4 style="font-weight: 700; color: #fff;">02. JSON Hierarchy Explorer</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Real-time key search and structural metrics</p>
+          <img src="assets/screenshots/screenshot2.png" alt="JSON Hierarchy" />
+          <span class="sample-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to Zoom</span>
+        </div>
+
+        <!-- Screenshot 3 -->
+        <div class="glass diagram-card" onclick="openModal('assets/screenshots/screenshot3.png')">
+          <h4 style="font-weight: 700; color: #fff;">03. Live Conversion Pipeline</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Real-time telemetry, logs, and normalization badges</p>
+          <img src="assets/screenshots/screenshot3.png" alt="Conversion Engine" />
+          <span class="sample-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to Zoom</span>
+        </div>
+
+        <!-- Screenshot 4 -->
+        <div class="glass diagram-card" onclick="openModal('assets/screenshots/screenshot4.png')">
+          <h4 style="font-weight: 700; color: #fff;">04. Generated Relational Tables</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Sortable, filterable SQLite data browser</p>
+          <img src="assets/screenshots/screenshot4.png" alt="SQL Tables" />
+          <span class="sample-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to Zoom</span>
+        </div>
+
+        <!-- Screenshot 5 -->
+        <div class="glass diagram-card" onclick="openModal('assets/screenshots/screenshot5.png')">
+          <h4 style="font-weight: 700; color: #fff;">05. Schema & ER Inspector</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Interactive schema details and normalization cards</p>
+          <img src="assets/screenshots/screenshot5.png" alt="Schema Inspector" />
+          <span class="sample-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to Zoom</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- System Architecture & UML Diagrams -->
+  <section id="architecture" style="padding: 90px 0;">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Under The Hood</span>
+        <h2 class="section-title">System Architecture & UML Diagrams</h2>
+        <p class="section-desc">
+          Clean separation of concerns between recursive schema inference, relation mapping, and the UI layer.
+        </p>
+      </div>
+
+      <div class="grid-3">
+        <!-- Flowchart -->
+        <div class="glass diagram-card" onclick="openModal('assets/diagrams/flowchart.svg')">
+          <h4 style="font-weight: 700; color: #fff;">Conversion Flowchart</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Step-by-step pipeline execution flow</p>
+          <img src="assets/diagrams/flowchart.svg" alt="Pipeline Flowchart" />
+          <span class="sample-btn"><i class="fa-solid fa-expand"></i> View Diagram</span>
+        </div>
+
+        <!-- Class Diagram -->
+        <div class="glass diagram-card" onclick="openModal('assets/diagrams/class_diagram.svg')">
+          <h4 style="font-weight: 700; color: #fff;">Class Architecture</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">Object-oriented schema models & engine</p>
+          <img src="assets/diagrams/class_diagram.svg" alt="Class Diagram" />
+          <span class="sample-btn"><i class="fa-solid fa-expand"></i> View Diagram</span>
+        </div>
+
+        <!-- Use Case Diagram -->
+        <div class="glass diagram-card" onclick="openModal('assets/diagrams/usecase_diagram.svg')">
+          <h4 style="font-weight: 700; color: #fff;">Use Case Diagram</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">User interaction and flow model</p>
+          <img src="assets/diagrams/usecase_diagram.svg" alt="Use Case Diagram" />
+          <span class="sample-btn"><i class="fa-solid fa-expand"></i> View Diagram</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Start & Installation -->
+  <section id="quickstart" style="padding: 90px 0;">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Developer Guide</span>
+        <h2 class="section-title">Run SQLify in Seconds</h2>
+        <p class="section-desc">
+          SQLify is built with standard Python and PySide6. Follow these quick steps to get up and running.
+        </p>
+      </div>
+
+      <div style="max-width: 800px; margin: 0 auto;">
+        <div class="terminal-box">
+          <button class="copy-btn" onclick="copyInstallCmd()"><i class="fa-solid fa-copy"></i> Copy</button>
+          <pre style="color: #4defff; margin-bottom: 8px;"># 1. Clone the repository</pre>
+          <code style="color: #fff;">git clone https://github.com/sumitimran1/sqlify.git<br>cd sqlify</code><br><br>
+          <pre style="color: #4defff; margin-bottom: 8px;"># 2. Set up virtual environment and install PySide6</pre>
+          <code style="color: #fff;">python -m venv .venv<br># On Windows: .\.venv\Scripts\activate<br># On Linux/macOS: source .venv/bin/activate<br>pip install -r requirements.txt</code><br><br>
+          <pre style="color: #4defff; margin-bottom: 8px;"># 3. Launch the application</pre>
+          <code style="color: #fff;">python app.py</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Image Lightbox Modal -->
+  <div id="imageModal" class="modal" onclick="closeModal()">
+    <span class="modal-close">&times;</span>
+    <img id="modalImg" class="modal-content" src="" alt="Enlarged View" />
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-inner">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <img src="assets/logo.svg" alt="SQLify Logo" width="30" height="30" />
+        <span style="font-weight: 700; color: #fff;">SQLify</span>
+        <span style="color: var(--text-muted); font-size: 0.88rem;">&copy; 2026 Sumit Imran. Distributed under the MIT License.</span>
+      </div>
+
+      <div style="display: flex; gap: 20px;">
+        <a href="https://github.com/sumitimran1/sqlify" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">
+          <i class="fa-brands fa-github"></i> GitHub Repository
+        </a>
+        <a href="#demo" style="color: var(--cyan); text-decoration: none; font-size: 0.9rem;">
+          <i class="fa-solid fa-play"></i> Live Simulator
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Interactive JavaScript Engine Simulator -->
+  <script>
+    // Tab Switcher for Preview Window
+    function switchPreviewTab(index, imageSrc) {
+      const tabs = document.querySelectorAll('.window-tab');
+      tabs.forEach((tab, i) => {
+        if (i === index) tab.classList.add('active');
+        else tab.classList.remove('active');
+      });
+      const img = document.getElementById('previewImage');
+      img.style.opacity = '0';
+      setTimeout(() => {
+        img.src = imageSrc;
+        img.style.opacity = '1';
+      }, 150);
+    }
+
+    // Modal Lightbox
+    function openModal(src) {
+      const modal = document.getElementById('imageModal');
+      const img = document.getElementById('modalImg');
+      img.src = src;
+      modal.classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('imageModal').classList.remove('active');
+    }
+
+    // Copy to clipboard helper
+    function copyInstallCmd() {
+      const text = `git clone https://github.com/sumitimran1/sqlify.git\ncd sqlify\npython -m venv .venv\n.\\.venv\\Scripts\\activate\npip install -r requirements.txt\npython app.py`;
+      navigator.clipboard.writeText(text);
+      alert('Installation commands copied to clipboard!');
+    }
+
+    function copyGeneratedSQL() {
+      const text = document.getElementById('sqlOutput').innerText;
+      navigator.clipboard.writeText(text);
+      alert('Generated SQL schema copied to clipboard!');
+    }
+
+    function formatInputJson() {
+      try {
+        const area = document.getElementById('jsonInput');
+        const parsed = JSON.parse(area.value);
+        area.value = JSON.stringify(parsed, null, 2);
+      } catch (e) {
+        alert('Invalid JSON syntax: ' + e.message);
+      }
+    }
+
+    // Sample Datasets
+    const SAMPLES = {
+      student: {
+        "student": {
+          "number": 101,
+          "name": "Ayse Yilmaz",
+          "active": true,
+          "address": {
+            "city": "Kocaeli",
+            "district": "Izmit",
+            "neighborhood": "Yahya Kaptan"
+          },
+          "courses": [
+            { "code": "CS101", "name": "Algorithms", "grades": [90, 95] },
+            { "code": "CS102", "name": "Databases", "grades": [85, 88] }
+          ],
+          "phones": ["+90 555 123 4567", "+90 555 987 6543"]
+        }
+      },
+      company: {
+        "company": {
+          "name": "Acme Corp",
+          "founded": 2012,
+          "headquarters": {
+            "city": "Istanbul",
+            "country": "Turkey"
+          },
+          "departments": [
+            {
+              "name": "Engineering",
+              "budget": 250000.0,
+              "employees": [
+                { "name": "Alice", "role": "Tech Lead" },
+                { "name": "Bob", "role": "DevOps Engineer" }
+              ]
+            }
+          ]
+        }
+      },
+      ecommerce: {
+        "order": {
+          "order_id": "ORD-98231",
+          "customer_name": "Sumit Imran",
+          "total_amount": 349.99,
+          "is_paid": true,
+          "items": [
+            { "sku": "KEY-RGB-01", "title": "Mechanical Keyboard", "quantity": 1, "price": 149.99 },
+            { "sku": "MOU-OPT-02", "title": "Ergonomic Mouse", "quantity": 2, "price": 100.00 }
+          ],
+          "shipping_address": {
+            "street": "Central Ave",
+            "city": "Ankara",
+            "postal_code": "06000"
+          }
+        }
+      }
+    };
+
+    function loadSample(key) {
+      if (SAMPLES[key]) {
+        document.getElementById('jsonInput').value = JSON.stringify(SAMPLES[key], null, 2);
+        runClientConverter();
+      }
+    }
+
+    // Client-side lightweight normalizer simulation
+    function runClientConverter() {
+      let data;
+      try {
+        data = JSON.parse(document.getElementById('jsonInput').value);
+      } catch (e) {
+        document.getElementById('sqlOutput').innerText = `-- ERROR: Invalid JSON\n-- ${e.message}`;
+        return;
+      }
+
+      const tables = {};
+
+      function cleanName(name) {
+        return name.replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
+      }
+
+      function inferType(val) {
+        if (typeof val === 'number') {
+          return Number.isInteger(val) ? 'INTEGER' : 'REAL';
+        }
+        if (typeof val === 'boolean') return 'INTEGER';
+        return 'TEXT';
+      }
+
+      function processObject(obj, tableName, parentTable = null, parentId = null) {
+        if (!tables[tableName]) {
+          tables[tableName] = { columns: {}, parentTable: parentTable };
+        }
+
+        const flatRow = {};
+        const arraysToProcess = [];
+
+        function flatten(curr, prefix = '') {
+          for (const key in curr) {
+            const val = curr[key];
+            const fullKey = prefix ? `${prefix}_${cleanName(key)}` : cleanName(key);
+
+            if (val !== null && typeof val === 'object' && !Array.isArray(val)) {
+              flatten(val, fullKey);
+            } else if (Array.isArray(val)) {
+              arraysToProcess.push({ key: fullKey, array: val });
+            } else {
+              flatRow[fullKey] = val;
+              tables[tableName].columns[fullKey] = inferType(val);
+            }
+          }
+        }
+
+        flatten(obj);
+
+        // Process child arrays
+        arraysToProcess.forEach(({ key, array }) => {
+          const childTableName = `${tableName}_${key}`;
+          array.forEach(item => {
+            if (item !== null && typeof item === 'object' && !Array.isArray(item)) {
+              processObject(item, childTableName, tableName);
+            } else {
+              // Primitive array
+              if (!tables[childTableName]) {
+                tables[childTableName] = { columns: { value: inferType(item) }, parentTable: tableName };
+              }
+            }
+          });
+        });
+      }
+
+      // Root level
+      for (const rootKey in data) {
+        const rootVal = data[rootKey];
+        if (typeof rootVal === 'object' && !Array.isArray(rootVal)) {
+          processObject(rootVal, cleanName(rootKey));
+        } else if (Array.isArray(rootVal)) {
+          rootVal.forEach(item => {
+            if (typeof item === 'object') processObject(item, cleanName(rootKey));
+          });
+        } else {
+          processObject(data, 'root_data');
+          break;
+        }
+      }
+
+      // Generate SQL Output
+      let sql = `-- =========================================================\n`;
+      sql += `-- SQLify Generated SQLite DDL Schema\n`;
+      sql += `-- Total Normalized Tables: ${Object.keys(tables).length}\n`;
+      sql += `-- =========================================================\n\n`;
+
+      for (const tName in tables) {
+        const t = tables[tName];
+        sql += `CREATE TABLE IF NOT EXISTS "${tName}" (\n`;
+        sql += `    "id" INTEGER PRIMARY KEY AUTOINCREMENT,\n`;
+        if (t.parentTable) {
+          sql += `    "${t.parentTable}_id" INTEGER NOT NULL,\n`;
+        }
+        const colDefs = [];
+        for (const cName in t.columns) {
+          colDefs.push(`    "${cName}" ${t.columns[cName]}`);
+        }
+        if (t.parentTable) {
+          colDefs.push(`    FOREIGN KEY ("${t.parentTable}_id") REFERENCES "${t.parentTable}" ("id") ON DELETE CASCADE`);
+        }
+        sql += colDefs.join(',\n') + '\n';
+        sql += `);\n\n`;
+      }
+
+      document.getElementById('sqlOutput').innerText = sql;
+    }
+
+    // Run on initial load
+    window.addEventListener('DOMContentLoaded', () => {
+      runClientConverter();
+    });
+  </script>
+</body>
+</html>
